@@ -20,5 +20,8 @@ arm-test:
 test-my:
 	arm-linux-gnueabihf-gcc test.s -o test -static
 	qemu-arm ./test
-
+bison:
+	bison -d test.y
+	gcc test.tab.c -o test
+	./test
 
