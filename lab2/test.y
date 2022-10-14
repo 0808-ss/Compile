@@ -18,8 +18,8 @@ void yyerror(const char* s);
 %token sub 
 %token mul 
 %token DIV 
-%token l_bracket 
-%token r_barcket 
+%token l_p 
+%token r_p 
 %token NUMBER
 %left add sub
 %left mul DIV
@@ -46,7 +46,7 @@ expr    :   expr add expr {$$ = (char*)malloc(50 * sizeof(char));
                             strcat($$, $3);
                             strcat($$, "* ");
                           }
-        |   l_bracket expr r_barcket  {$$ = $2;}
+        |   l_p expr r_p  {$$ = $2;}
         |   expr DIV expr{$$ = (char*)malloc(50 * sizeof(char));
                             strcpy($$, $1);
                             strcat($$, $3);
@@ -116,10 +116,10 @@ int yylex()
 			return DIV;
 		}
 		else if(t == '('){
-			return l_bracket;
+			return l_p;
 		}
 		else if(t == ')'){
-			return r_barcket;
+			return r_p;
 		}
 		else{
 			return t;
