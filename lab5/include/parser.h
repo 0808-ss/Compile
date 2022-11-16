@@ -67,37 +67,38 @@ extern int yydebug;
     INT = 265,
     VOID = 266,
     CHAR = 267,
-    CONST = 268,
-    LPAREN = 269,
-    RPAREN = 270,
-    LBRACE = 271,
-    RBRACE = 272,
-    LSBRACE = 273,
-    RSBRACE = 274,
-    SEMICOLON = 275,
-    COMMA = 276,
-    ADD = 277,
-    SUB = 278,
-    MUL = 279,
-    DIV = 280,
-    EXCLAMATION = 281,
-    MORE = 282,
-    OR = 283,
-    AND = 284,
-    LESS = 285,
-    ASSIGN = 286,
-    EQUAL = 287,
-    NOEQUAL = 288,
-    LESSEQUAL = 289,
-    MOREEQUAL = 290,
-    PERC = 291,
-    RETURN = 292,
-    LINECOMMENT = 293,
-    COMMENTBEIGN = 294,
-    COMMENTELEMENT = 295,
-    COMMENTLINE = 296,
-    COMMENTEND = 297,
-    THEN = 298
+    FLOAT = 268,
+    CONST = 269,
+    LPAREN = 270,
+    RPAREN = 271,
+    LBRACE = 272,
+    RBRACE = 273,
+    LSBRACE = 274,
+    RSBRACE = 275,
+    SEMICOLON = 276,
+    COMMA = 277,
+    ADD = 278,
+    SUB = 279,
+    MUL = 280,
+    DIV = 281,
+    EXCLAMATION = 282,
+    MORE = 283,
+    OR = 284,
+    AND = 285,
+    LESS = 286,
+    ASSIGN = 287,
+    EQUAL = 288,
+    NOEQUAL = 289,
+    LESSEQUAL = 290,
+    MOREEQUAL = 291,
+    PERC = 292,
+    RETURN = 293,
+    LINECOMMENT = 294,
+    COMMENTBEIGN = 295,
+    COMMENTELEMENT = 296,
+    COMMENTLINE = 297,
+    COMMENTEND = 298,
+    THEN = 299
   };
 #endif
 
@@ -111,11 +112,12 @@ union YYSTYPE
     char* strtype;
     StmtNode* stmttype;
     ExprNode* exprtype;
+    DeclStmt* decl;
     Type* type;
     FuncFParams* Fstype;
     FuncRParams* FRtype;
 
-#line 119 "include/parser.h"
+#line 121 "include/parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

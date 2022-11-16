@@ -11,9 +11,10 @@ private:
     int kind;
 protected:
     enum {CONSTANT, VARIABLE, TEMPORARY};
-    Type *type;
+    
 
 public:
+    Type *type;
     SymbolEntry(Type *type, int kind);
     virtual ~SymbolEntry() {};
     bool isConstant() const {return kind == CONSTANT;};

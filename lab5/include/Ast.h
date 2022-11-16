@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <vector>
+#include "SymbolTable.h"
 
 class SymbolEntry;
 
@@ -22,9 +23,9 @@ public:
 
 class ExprNode : public Node
 {
-protected:
-    SymbolEntry *symbolEntry;
 public:
+    SymbolEntry *symbolEntry;
+
     ExprNode(SymbolEntry *symbolEntry) : symbolEntry(symbolEntry){};
     virtual int getValue() { return 0; };
 };
@@ -53,6 +54,7 @@ class Id : public ExprNode
 public:
     Id(SymbolEntry *se) : ExprNode(se){};
     void output(int level);
+    void change();
 };
 
 class ConstId : public ExprNode
@@ -180,6 +182,9 @@ class DeclStmt : public StmtNode {
    public:
     DeclStmt(Id* id, ExprNode* expr = nullptr) : id(id), expr(expr){};
     void output(int level);
+
+    std::string getname();
+
     Id* getId() { return id; };
 };
 

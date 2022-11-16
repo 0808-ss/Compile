@@ -2,6 +2,7 @@
 #include "SymbolTable.h"
 #include <string>
 #include "Type.h"
+#include <iostream>
 
 extern FILE *yyout;
 int Node::counter = 0;
@@ -147,17 +148,6 @@ void ConstId::output(int level)
             name.c_str(), scope, type.c_str());
 }
 
-// void Id::output(int level)
-// {
-//     std::string name, type;
-//     int scope;
-//     name = symbolEntry->toStr();
-//     type = symbolEntry->getType()->toStr();
-//     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
-//     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
-//             name.c_str(), scope, type.c_str());
-// }
-
 
 void Id::output(int level) {
     std::string name, type;
@@ -167,6 +157,10 @@ void Id::output(int level) {
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
             name.c_str(), scope, type.c_str());
+}
+
+void Id::change(){
+    symbolEntry->type = TypeSystem::floatType;
 }
 
 void FuncFParam::output(int level)
@@ -213,6 +207,12 @@ void DeclStmt::output(int level) {
     }
     //output the tree by the chain of link of expr
 }
+
+std::string DeclStmt::getname() {
+    return this->id->symbolEntry->toStr();
+}
+
+
 
 void IfStmt::output(int level)
 {

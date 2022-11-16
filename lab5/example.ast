@@ -1,35 +1,9 @@
 program
-    Sequence
-        Sequence
-            Sequence
-                Sequence
-                    Sequence
-                        DeclStmt
-                            Id	name: a	scope: 0	type: int
-                        AssignStmt
-                            Id	name: a	scope: 0	type: int
-                            SignleExpr	op: anti
-                                Id	name: a	scope: 0	type: int
-                    DeclStmt
-                        Id	name: k	scope: 0	type: int
-                Signle Statement
-                    BinaryExpr	op: add
-                        Id	name: k	scope: 0	type: int
-                        IntegerLiteral	value: 1	type: int
-            FunctionDefine function name: m, type: int()
-                CompoundStmt
-                    Sequence
-                        DeclStmt
-                            Id	name: b	scope: 2	type: int
-                            IntegerLiteral	value: 1	type: int
-                        ReturnStmt
-                            Id	name: b	scope: 2	type: int
-        FunctionDefine function name: main, type: int()
-            CompoundStmt
-                Signle Statement
-                    FuncCall	name: m	type: int()
-                        FuncRParams
-                            Id	name: a	scope: 0	type: int
-                            BinaryExpr	op: add
-                                IntegerLiteral	value: 1	type: int
-                                IntegerLiteral	value: 1	type: int
+    FunctionDefine function name: main, type: float()
+        CompoundStmt
+            DeclStmt
+                Id	name: a	scope: 2	type: float
+            DeclStmt
+                Id	name: b	scope: 2	type: float
+            DeclStmt
+                Id	name: c	scope: 2	type: float

@@ -18,6 +18,7 @@
     char* strtype;
     StmtNode* stmttype;
     ExprNode* exprtype;
+    DeclStmt* decl;
     Type* type;
     FuncFParams* Fstype;
     FuncRParams* FRtype;
@@ -28,16 +29,17 @@
 %token <itype> INTEGER
 %token IF ELSE BREAK CONTINUE
 %token WHILE
-%token INT VOID CHAR
+%token INT VOID CHAR FLOAT
 %token CONST 
 %token LPAREN RPAREN LBRACE RBRACE LSBRACE RSBRACE SEMICOLON COMMA
 %token ADD SUB MUL DIV EXCLAMATION MORE OR AND LESS ASSIGN EQUAL NOEQUAL LESSEQUAL MOREEQUAL PERC
 %token RETURN
 %token LINECOMMENT COMMENTBEIGN COMMENTELEMENT COMMENTLINE COMMENTEND
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt VarDeclStmt ConstDeclStmt VarDef VarDefList ConstDefList ConstDef SingleStmt
-%nterm <exprtype> Exp ConstInitvalue AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp Initvalue UnaryExp
-%nterm <type> Type 
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt VarDeclStmt ConstDeclStmt ConstDefList ConstDef SingleStmt
+%nterm <exprtype> Exp ConstInitvalue AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp Initvalue UnaryExp 
+%nterm <type> Type
+%nterm <decl> VarDefList VarDef 
 %nterm <Fstype> FuncFParams
 %nterm <FRtype> FuncRParams
 
@@ -305,8 +307,10 @@ Type
         $$ = TypeSystem::intType;
     } | VOID {
         $$ = TypeSystem::voidType;
-    } | CHAR{
+    } | CHAR {
         $$ = TypeSystem::charType;
+    } | FLOAT {
+        $$ = TypeSystem::floatType;
     }
     ;
 
@@ -319,6 +323,20 @@ VarDeclStmt
     : Type VarDefList SEMICOLON {
         $$ = $2;
         //if we want to think the type(int/float) , we must exchange the mode
+        if ($1 != TypeSystem::intType) {
+            SymbolEntry* se;
+            se = new IdentifierSymbolEntry(TypeSystem::floatType, $2->getname(), identifiers->getLevel());
+            identifiers->install($2->getname(), se);
+            $2->getId()->change();
+            DeclStmt *now = $2;
+            while (now->getNext() != nullptr) {
+                now = dynamic_cast<DeclStmt*>(now->getNext());
+                SymbolEntry* se;
+                se = new IdentifierSymbolEntry(TypeSystem::floatType, now->getname(), identifiers->getLevel());
+                identifiers->install(now->getname(), se);
+                now->getId()->change();
+            }
+        }
     }
     ;
 
@@ -360,7 +378,6 @@ VarDef
         //if the type is float, we must change the type in the proc of decl
         ((IdentifierSymbolEntry*)se)->setValue($3->getValue());
         $$ = new DeclStmt(new Id(se), $3);
-        //DeclStmt(Id* id, ExprNode* expr = nullptr) : id(id), expr(expr){};
         delete []$1;
     }
     ;

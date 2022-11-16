@@ -54,6 +54,12 @@ COMMENTEND "*/"
         DEBUG_FOR_LAB4("INT\tint");
     return INT;
 }
+"float" {
+    if(dump_tokens)
+        DEBUG_FOR_LAB4("FLOAT\tfloat");
+    return FLOAT;
+}
+
 "void" {
     if(dump_tokens)
         DEBUG_FOR_LAB4("VOID\tvoid");
