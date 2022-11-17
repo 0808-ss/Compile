@@ -163,6 +163,11 @@ void Id::change(){
     symbolEntry->type = TypeSystem::floatType;
 }
 
+void ConstId::change(){
+    symbolEntry->type = TypeSystem::floatType;
+}
+
+
 void FuncFParam::output(int level)
 {
     std::string name, type;
@@ -212,6 +217,20 @@ std::string DeclStmt::getname() {
     return this->id->symbolEntry->toStr();
 }
 
+void ConstDeclStmt::output(int level) {
+    fprintf(yyout, "%*cConstDeclStmt\n", level, ' ');
+    id->output(level + 4);
+    if (expr)
+        expr->output(level + 4);
+    if (this->getNext()) {
+        this->getNext()->output(level);
+    }
+    //output the tree by the chain of link of expr
+}
+
+std::string ConstDeclStmt::getname() {
+    return this->id->symbolEntry->toStr();
+}
 
 
 void IfStmt::output(int level)

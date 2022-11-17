@@ -1,4 +1,4 @@
 float main(){
-    float a, b, c;
+    const float a=1.5, b=2, c=3;
 
 }

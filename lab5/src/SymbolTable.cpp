@@ -16,10 +16,25 @@ ConstantSymbolEntry::ConstantSymbolEntry(Type *type, int value) : SymbolEntry(ty
 
 std::string ConstantSymbolEntry::toStr()
 {
-    std::ostringstream buffer;
-    buffer << value;
-    return buffer.str();
+        std::ostringstream buffer;
+        buffer << value;
+        return buffer.str();
+} 
+
+
+FloatConstantSymbolEntry::FloatConstantSymbolEntry(Type *type, float value) : SymbolEntry(type, SymbolEntry::CONSTANT)
+{
+    this->value = value;
 }
+
+std::string FloatConstantSymbolEntry::toStr()
+{
+        std::ostringstream buffer;
+        buffer << value;
+        return buffer.str();
+} 
+
+
 
 IdentifierSymbolEntry::IdentifierSymbolEntry(Type *type, std::string name, int scope) : SymbolEntry(type, SymbolEntry::VARIABLE), name(name)
 {

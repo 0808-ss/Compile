@@ -39,7 +39,9 @@ public:
     enum {ADD, SUB, AND, OR, LESS, MORE, MOREEQUAL, LESSEQUAL, EQUAL, NOEQUAL, MUL, DIV, PERC};
     BinaryExpr(SymbolEntry *se, int op, ExprNode*expr1, ExprNode*expr2) : ExprNode(se), op(op), expr1(expr1), expr2(expr2){};
     void output(int level);
-     int getValue();
+    void typeCheck();
+    void genCode();
+    int getValue();
 };
 
 class Constant : public ExprNode
@@ -62,6 +64,7 @@ class ConstId : public ExprNode
 public:
     ConstId(SymbolEntry *se) : ExprNode(se){};
     void output(int level);
+    void change();
 };
 
 class FuncFParam : public ExprNode
@@ -186,6 +189,20 @@ class DeclStmt : public StmtNode {
     std::string getname();
 
     Id* getId() { return id; };
+};
+
+class ConstDeclStmt : public StmtNode {
+   private:
+    ConstId* id;
+    ExprNode* expr;
+
+   public:
+    ConstDeclStmt(ConstId* id, ExprNode* expr = nullptr) : id(id), expr(expr){};
+    void output(int level);
+
+    std::string getname();
+
+    ConstId* getId() { return id; };
 };
 
 class IfStmt : public StmtNode

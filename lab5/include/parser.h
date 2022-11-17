@@ -59,46 +59,47 @@ extern int yydebug;
   {
     ID = 258,
     INTEGER = 259,
-    IF = 260,
-    ELSE = 261,
-    BREAK = 262,
-    CONTINUE = 263,
-    WHILE = 264,
-    INT = 265,
-    VOID = 266,
-    CHAR = 267,
-    FLOAT = 268,
-    CONST = 269,
-    LPAREN = 270,
-    RPAREN = 271,
-    LBRACE = 272,
-    RBRACE = 273,
-    LSBRACE = 274,
-    RSBRACE = 275,
-    SEMICOLON = 276,
-    COMMA = 277,
-    ADD = 278,
-    SUB = 279,
-    MUL = 280,
-    DIV = 281,
-    EXCLAMATION = 282,
-    MORE = 283,
-    OR = 284,
-    AND = 285,
-    LESS = 286,
-    ASSIGN = 287,
-    EQUAL = 288,
-    NOEQUAL = 289,
-    LESSEQUAL = 290,
-    MOREEQUAL = 291,
-    PERC = 292,
-    RETURN = 293,
-    LINECOMMENT = 294,
-    COMMENTBEIGN = 295,
-    COMMENTELEMENT = 296,
-    COMMENTLINE = 297,
-    COMMENTEND = 298,
-    THEN = 299
+    FLOAT_NUM = 260,
+    IF = 261,
+    ELSE = 262,
+    BREAK = 263,
+    CONTINUE = 264,
+    WHILE = 265,
+    INT = 266,
+    VOID = 267,
+    CHAR = 268,
+    FLOAT = 269,
+    CONST = 270,
+    LPAREN = 271,
+    RPAREN = 272,
+    LBRACE = 273,
+    RBRACE = 274,
+    LSBRACE = 275,
+    RSBRACE = 276,
+    SEMICOLON = 277,
+    COMMA = 278,
+    ADD = 279,
+    SUB = 280,
+    MUL = 281,
+    DIV = 282,
+    EXCLAMATION = 283,
+    MORE = 284,
+    OR = 285,
+    AND = 286,
+    LESS = 287,
+    ASSIGN = 288,
+    EQUAL = 289,
+    NOEQUAL = 290,
+    LESSEQUAL = 291,
+    MOREEQUAL = 292,
+    PERC = 293,
+    RETURN = 294,
+    LINECOMMENT = 295,
+    COMMENTBEIGN = 296,
+    COMMENTELEMENT = 297,
+    COMMENTLINE = 298,
+    COMMENTEND = 299,
+    THEN = 300
   };
 #endif
 
@@ -110,14 +111,16 @@ union YYSTYPE
 
     int itype;
     char* strtype;
+    float floattype;
     StmtNode* stmttype;
     ExprNode* exprtype;
     DeclStmt* decl;
+    ConstDeclStmt* cdecl;
     Type* type;
     FuncFParams* Fstype;
     FuncRParams* FRtype;
 
-#line 121 "include/parser.h"
+#line 124 "include/parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

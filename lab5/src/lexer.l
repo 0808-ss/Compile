@@ -27,6 +27,8 @@ ID [[:alpha:]_][[:alpha:][:digit:]_]*
 char ('.')
 EOL (\r\n|\n|\r)
 WHITE [\t ]
+FLOAT_NUM (([0-9]+(\.[0-9]+)?([Ee]([+-])?[0-9]+)?)|(\.(([0-9]*)|([Ee]([+-])?[0-9]+)))|(0[xX]([1-9A-Fa-f][0-9A-Fa-f]*)?((\.[0-9A-Fa-f]*[Pp]([+-])?[0-9]+)|([Pp]([+-])?[0-9]+))))
+
 
 LINECOMMENT \/\/[^\n]*
 COMMENTBEIGN "/*"
@@ -272,6 +274,17 @@ COMMENTEND "*/"
     yylval.itype = all;
     return INTEGER;
 } 
+
+{FLOAT_NUM} {
+    float temp;
+    temp = atof(yytext);
+    yylval.floattype=temp;
+    if(dump_tokens)
+        DEBUG_FOR_LAB4(string("FLOAT\t").append(to_string(temp)));
+    return FLOAT_NUM;
+}
+
+
 
 {ID} {
     if(dump_tokens)

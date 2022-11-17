@@ -16,9 +16,11 @@
 %union {
     int itype;
     char* strtype;
+    float floattype;
     StmtNode* stmttype;
     ExprNode* exprtype;
     DeclStmt* decl;
+    ConstDeclStmt* cdecl;
     Type* type;
     FuncFParams* Fstype;
     FuncRParams* FRtype;
@@ -27,19 +29,21 @@
 %start Program
 %token <strtype> ID 
 %token <itype> INTEGER
+%token <floattype> FLOAT_NUM
 %token IF ELSE BREAK CONTINUE
 %token WHILE
-%token INT VOID CHAR FLOAT
+%token INT VOID CHAR FLOAT 
 %token CONST 
 %token LPAREN RPAREN LBRACE RBRACE LSBRACE RSBRACE SEMICOLON COMMA
 %token ADD SUB MUL DIV EXCLAMATION MORE OR AND LESS ASSIGN EQUAL NOEQUAL LESSEQUAL MOREEQUAL PERC
 %token RETURN
 %token LINECOMMENT COMMENTBEIGN COMMENTELEMENT COMMENTLINE COMMENTEND
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt VarDeclStmt ConstDeclStmt ConstDefList ConstDef SingleStmt
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt VarDeclStmt ConstDeclStmt  SingleStmt
 %nterm <exprtype> Exp ConstInitvalue AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp Initvalue UnaryExp 
 %nterm <type> Type
 %nterm <decl> VarDefList VarDef 
+%nterm <cdecl> ConstDefList ConstDef
 %nterm <Fstype> FuncFParams
 %nterm <FRtype> FuncRParams
 
@@ -198,6 +202,9 @@ PrimaryExp
     } | INTEGER {
         SymbolEntry *se = new ConstantSymbolEntry(TypeSystem::intType, $1);
         $$ = new Constant(se);
+    } | FLOAT_NUM {
+        SymbolEntry *se = new FloatConstantSymbolEntry(TypeSystem::floatType, $1);
+        $$ = new Constant(se);
     } | LPAREN Exp RPAREN{$$ = $2;}
     ;
 
@@ -343,6 +350,20 @@ VarDeclStmt
 ConstDeclStmt
     : CONST Type ConstDefList SEMICOLON {
         $$ = $3;
+         if ($2 != TypeSystem::intType) {
+            SymbolEntry* se;
+            se = new IdentifierSymbolEntry(TypeSystem::floatType, $3->getname(), identifiers->getLevel());
+            identifiers->install($3->getname(), se);
+            $3->getId()->change();
+            ConstDeclStmt *now = $3;
+            while (now->getNext() != nullptr) {
+                now = dynamic_cast<ConstDeclStmt*>(now->getNext());
+                SymbolEntry* se;
+                se = new IdentifierSymbolEntry(TypeSystem::floatType, now->getname(), identifiers->getLevel());
+                identifiers->install(now->getname(), se);
+                now->getId()->change();
+            }
+        }
     }
     ;
 
@@ -389,7 +410,7 @@ ConstDef
         // error
         identifiers->install($1, se);
         ((IdentifierSymbolEntry*)se)->setValue($3->getValue());
-        $$ = new DeclStmt(new Id(se), $3);
+        $$ = new ConstDeclStmt(new ConstId(se), $3);
         delete []$1;
     }
 

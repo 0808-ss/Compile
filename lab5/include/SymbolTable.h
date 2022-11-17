@@ -35,14 +35,27 @@ class ConstantSymbolEntry : public SymbolEntry
 {
 private:
     int value;
-
 public:
     ConstantSymbolEntry(Type *type, int value);
     virtual ~ConstantSymbolEntry() {};
     int getValue() const {return value;};
     std::string toStr();
     // You can add any function you need here.
+    // 如果为真则返回int
 };
+
+class FloatConstantSymbolEntry : public SymbolEntry
+{
+private:
+    float value;
+public:
+    FloatConstantSymbolEntry(Type *type, float value);
+    virtual ~FloatConstantSymbolEntry() {};
+    float getValue() const {return value;};
+    std::string toStr();
+    // You can add any function you need here.
+};
+
 
 
 /* 
