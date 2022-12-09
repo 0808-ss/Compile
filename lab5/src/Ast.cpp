@@ -346,7 +346,7 @@ void SingleExpr::output(int level)
             op_str = "anti";
             break;
     }
-    fprintf(yyout, "%*cSignleExpr\top: %s\n", level, ' ', op_str.c_str());
+    fprintf(yyout, "%*cSingleExpr\top: %s\n", level, ' ', op_str.c_str());
     expr->output(level + 4);
 }
 
