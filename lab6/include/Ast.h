@@ -52,7 +52,9 @@ class ExprNode : public Node {
     enum { EXPR, INITVALUELISTEXPR, IMPLICTCASTEXPR, UNARYEXPR };
     Type* type;
     SymbolEntry* symbolEntry;
-    Operand* dst;  // The result of the subtree is stored into dst.
+    Operand* dst;  
+    // The result of the subtree is stored into dst.
+    
    public:
     ExprNode(SymbolEntry* symbolEntry, int kind = EXPR)
         : kind(kind), symbolEntry(symbolEntry){};

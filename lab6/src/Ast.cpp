@@ -129,8 +129,10 @@ void Ast::genCode(Unit* unit) {
 void FunctionDef::genCode() {
     Unit* unit = builder->getUnit();
     Function* func = new Function(unit, se);
+    //我们生成代码都必须注意，我们在宏观上是在为函数生成
     BasicBlock* entry = func->getEntry();
     // set the insert point to the entry basicblock of this function.
+    // 直接取得入口块的地址
 
     builder->setInsertBB(entry);
     if (decl) decl->genCode();
@@ -142,26 +144,28 @@ void FunctionDef::genCode() {
      * for each basic block. Todo
      */
     for (auto block = func->begin(); block != func->end(); block++) {
-        //获取该块的最后一条指令
+        //函数由基本块组成，获取该块的最后一条指令
         Instruction* i = (*block)->begin();
         Instruction* last = (*block)->rbegin();
+
         while (i != last) {
             if (i->isCond() || i->isUncond()) {
                 (*block)->remove(i);
             }
             i = i->getNext();
         }
+        
+
         if (last->isCond()) {
             BasicBlock *truebranch, *falsebranch;
-            truebranch =
-                dynamic_cast<CondBrInstruction*>(last)->getTrueBranch();
-            falsebranch =
-                dynamic_cast<CondBrInstruction*>(last)->getFalseBranch();
+            truebranch = dynamic_cast<CondBrInstruction*>(last)->getTrueBranch();
+            falsebranch = dynamic_cast<CondBrInstruction*>(last)->getFalseBranch();
             if (truebranch->empty()) {
                 new RetInstruction(nullptr, truebranch);
 
             } else if (falsebranch->empty()) {
                 new RetInstruction(nullptr, falsebranch);
+                
             }
             (*block)->addSucc(truebranch);
             (*block)->addSucc(falsebranch);
@@ -171,11 +175,14 @@ void FunctionDef::genCode() {
         } else if (last->isUncond()) {
             //无条件跳转指令可获取跳转的目标块
             BasicBlock* next_flow = dynamic_cast<UncondBrInstruction*>(last)->getBranch();
+
             (*block)->addSucc(next_flow);
             next_flow->addPred(*block);
             if (next_flow->empty()) {
-                if (((FunctionType*)(se->getType()))->getRetType() == TypeSystem::intType) new RetInstruction(new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0)), next_flow);
-                else if (((FunctionType*)(se->getType()))->getRetType() == TypeSystem::voidType) new RetInstruction(nullptr, next_flow);
+                if (((FunctionType*)(se->getType()))->getRetType() == TypeSystem::intType) 
+                    new RetInstruction(new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0)), next_flow);
+                else if (((FunctionType*)(se->getType()))->getRetType() == TypeSystem::voidType) 
+                    new RetInstruction(nullptr, next_flow);
             }
 
         }
@@ -213,6 +220,7 @@ void BinaryExpr::genCode() {
         expr2->genCode();
         true_list = merge(expr1->trueList(), expr2->trueList());
         false_list = expr2->falseList();
+        
     } else if (op >= LESS && op <= NOTEQUAL) {
         // Todo
         expr1->genCode();
@@ -229,28 +237,28 @@ void BinaryExpr::genCode() {
             new ZextInstruction(dst, src2, bb);
             src2 = dst;
         }
-        int cmpopcode;
+        int op_kind;
         switch (op) {
             case LESS:
-                cmpopcode = CmpInstruction::L;
+                op_kind = CmpInstruction::L;
                 break;
             case LESSEQUAL:
-                cmpopcode = CmpInstruction::LE;
+                op_kind = CmpInstruction::LE;
                 break;
             case MORE:
-                cmpopcode = CmpInstruction::G;
+                op_kind = CmpInstruction::G;
                 break;
             case MOREEQUAL:
-                cmpopcode = CmpInstruction::GE;
+                op_kind = CmpInstruction::GE;
                 break;
             case EQUAL:
-                cmpopcode = CmpInstruction::E;
+                op_kind = CmpInstruction::E;
                 break;
             case NOTEQUAL:
-                cmpopcode = CmpInstruction::NE;
+                op_kind = CmpInstruction::NE;
                 break;
         }
-        new CmpInstruction(cmpopcode, dst, src1, src2, bb);
+        new CmpInstruction(op_kind, dst, src1, src2, bb);
         BasicBlock *truebb, *falsebb, *tempbb;
         //临时假块
         truebb = new BasicBlock(func);
@@ -290,12 +298,14 @@ void BinaryExpr::genCode() {
 
 void Constant::genCode() {
     // we don't need to generate code.
+    // we input the value in the elder state
 }
 
 void Id::genCode() {
     BasicBlock* bb = builder->getInsertBB();
     Operand* addr = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getAddr();
     if (type->isInt()) new LoadInstruction(dst, addr, bb);
+    //直接载入运算即可
     else if (type->isArray()) {
         if (arrIdx) {
             Type* type = ((ArrayType*)(this->type))->getElementType();
@@ -312,12 +322,14 @@ void Id::genCode() {
                     Operand* dst1 = new Operand(new TemporarySymbolEntry(new PointerType(type), SymbolTable::getLabel()));
                     tempSrc = dst1;
                     new LoadInstruction(dst1, addr, bb);
+                    //已经确实找到真正需要载入变量的位置了
                     flag = true;
                 }
                 if (!idx) {
                     Operand* dst1 = new Operand(new TemporarySymbolEntry(new PointerType(type), SymbolTable::getLabel()));
                     Operand* idx = new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0));
                     new GepInstruction(dst1, tempSrc, idx, bb);
+                    //进行指针的变换操作
                     tempDst = dst1;
                     pointer = true;
                     break;
@@ -345,6 +357,7 @@ void Id::genCode() {
 
         } else {
             // 这里先这么办 后续有问题再改
+            // 代表数组没有传入初始化的参数
             if (((ArrayType*)(this->type))->getLength() == -1) {
                 Operand* dst1 = new Operand(new TemporarySymbolEntry(new PointerType(((ArrayType*)(this->type))->getElementType()), SymbolTable::getLabel()));
                 new LoadInstruction(dst1, addr, bb);
@@ -353,6 +366,7 @@ void Id::genCode() {
             } else {
                 Operand* idx = new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0));
                 new GepInstruction(dst, addr, idx, bb);
+                //相同的数组偏移的工作
             }
         }
     }
@@ -433,6 +447,7 @@ void DeclStmt::genCode() {
         se->setAddr(addr);
         unit.insertGlobal(se);
     } else if (se->isLocal() || se->isParam()) {
+
         Function* func = builder->getInsertBB()->getParent();
         BasicBlock* entry = func->getEntry();
         Instruction* alloca;
@@ -465,6 +480,7 @@ void DeclStmt::genCode() {
                         idx.push_back(0);
                         temp = ((InitValueListExpr*)temp)->getExpr();
                         continue;
+                        //保证还是针对列表生成
                     } else {
                         temp->genCode();
                         Type* type = ((ArrayType*)(se->getType()))->getElementType();
@@ -473,9 +489,7 @@ void DeclStmt::genCode() {
                         Operand* index;
                         int i = 1;
                         while (1) {
-                            tempDst = new Operand(new TemporarySymbolEntry(
-                                new PointerType(type),
-                                SymbolTable::getLabel()));
+                            tempDst = new Operand(new TemporarySymbolEntry(new PointerType(type), SymbolTable::getLabel()));
                             index = (new Constant(new ConstantSymbolEntry(TypeSystem::intType, idx[i++])))->getOperand();
                             new GepInstruction(tempDst, tempSrc, index, bb);
                             if (type == TypeSystem::intType || type == TypeSystem::constIntType) break;
@@ -484,7 +498,9 @@ void DeclStmt::genCode() {
                         }
                         new StoreInstruction(tempDst, temp->getOperand(), bb);
                     }
-                    while (true) {
+                    //已经结束针对列表的工作
+
+                    while (1) {
                         if (temp->getNext()) {
                             temp = (ExprNode*)(temp->getNext());
                             idx[idx.size() - 1]++;
@@ -498,13 +514,22 @@ void DeclStmt::genCode() {
                     }
                     if (stk.empty()) break;
                 }
-            } else {
+                //保证表达式串存在
+
+            } 
+            //保证了我们针对初始化列表的代码生成 
+
+
+
+            else {
                 BasicBlock* bb = builder->getInsertBB();
                 expr->genCode();
                 Operand* src = expr->getOperand();
                 new StoreInstruction(addr, src, bb);
             }
         }
+        //保证了表达式存在
+
         if (se->isParam()) {
             BasicBlock* bb = builder->getInsertBB();
             new StoreInstruction(addr, temp, bb);
@@ -525,6 +550,7 @@ void ReturnStmt::genCode() {
     }
     new RetInstruction(src, bb);
 }
+
 void ExprStmt::genCode() {
     // Todo
     expr->genCode();
@@ -537,6 +563,7 @@ void ContinueStmt::genCode() {
     BasicBlock* continue_next_bb = new BasicBlock(func);
     builder->setInsertBB(continue_next_bb);
 }
+
 void BreakStmt::genCode() {
     // Todo
     Function* func = builder->getInsertBB()->getParent();
@@ -545,6 +572,7 @@ void BreakStmt::genCode() {
     BasicBlock* break_next_bb = new BasicBlock(func);
     builder->setInsertBB(break_next_bb);
 }
+
 void WhileStmt::genCode() {
     Function* func;
     BasicBlock *cond_bb, *while_bb, *end_bb, *bb;
@@ -570,9 +598,11 @@ void WhileStmt::genCode() {
     stmt->genCode();
 
     while_bb = builder->getInsertBB();
+
     new UncondBrInstruction(cond_bb, while_bb);
 
     builder->setInsertBB(end_bb);
+    
 }
 void BlankStmt::genCode() {
     // Todo
@@ -606,17 +636,18 @@ void UnaryExpr::genCode() {
     } else if (op == SUB) {
         Operand* src2;
         BasicBlock* bb = builder->getInsertBB();
-        Operand* src1 =
-            new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0));
+        Operand* src1 = new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0));
+        //先new出一个操作对象
         if (expr->getType()->getSize() == 1) {
-            src2 = new Operand(new TemporarySymbolEntry(
-                TypeSystem::intType, SymbolTable::getLabel()));
+            src2 = new Operand(new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel()));
             new ZextInstruction(src2, expr->getOperand(), bb);
+            //进行类型转换相关的操作
         } else
             src2 = expr->getOperand();
         new BinaryInstruction(BinaryInstruction::SUB, dst, src1, src2, bb);
     }
 }
+
 void ExprNode::genCode() {
     // Todo
 }
